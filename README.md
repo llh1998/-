@@ -16,3 +16,13 @@ cdn_name：CDN的全称是Content Delivery Network，即内容分发网络。CDN
 
 ##  三、流程框架
 <img width="645" height="1092" alt="image" src="https://github.com/user-attachments/assets/056d455c-7190-4940-893c-9b609bbf6992" />
+ 
+##  四、python连接mysql取数
+通过Pymysql连接MYSQL数据库，设置day变量实现动态取数
+<img width="1255" height="353" alt="Screenshot 2026-02-26 121820" src="https://github.com/user-attachments/assets/8eae52eb-e07c-4e91-b99e-a7ba9f0f987b" />
+
+##  五、神经网络Prophet时序异常检测算法
+由于大多类似卡顿率等核心指标均周期性，传统的异常检测算法难以学习周期性，所以我们选择FaceBook开源的时序异常检测算法神经网络Prophet。
+<img width="1285" height="869" alt="image" src="https://github.com/user-attachments/assets/03e0e290-3aa4-4e64-9ffa-d81cd51b0def" />
+
+##  六、神经网络Prophet时序异常检测算法
