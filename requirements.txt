@@ -1,17 +1,9 @@
-# --- 基础数据处理 ---
-pandas>=2.0.0
-numpy>=1.24.0
+pandas==2.0.3
+numpy==1.22.4
+scikit-learn==1.3.2
+matplotlib==3.7.5
+# 其他库不加版本号，让系统自动匹配最合适的
+seaborn
+scipy
 
-# --- 数据可视化 ---
-matplotlib>=3.7.0
-seaborn>=0.12.0
-plotly>=5.15.0      # 如果你需要交互式图表
 
-# --- 机器学习与统计 ---
-scikit-learn>=1.3.0
-scipy>=1.11.0
-statsmodels>=0.14.0 # 统计分析必备
-
-# --- Jupyter 运行环境 ---
-ipykernel
-notebook
