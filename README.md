@@ -6,3 +6,13 @@
 
 ## 二、数据介绍
 
+user_plat：用户使用什么平台观看视频，例如adr/ios
+roomid：视频id
+province：用户所在省份
+isp：用户所用运营商
+ka_people：当天总卡顿人数
+all_people：当天总观看视频人数
+cdn_name：CDN的全称是Content Delivery Network，即内容分发网络。CDN的基本原理是广泛采用各种缓存服务器，将这些缓存服务器分布到用户访问相对集中的地区或网络中，在用户访问网站时，利用全局负载技术将用户的访问指向距离最近的工作正常的缓存服务器上，由缓存服务器直接响应用户请求
+
+##  三、流程框架
+<img width="645" height="1092" alt="image" src="https://github.com/user-attachments/assets/056d455c-7190-4940-893c-9b609bbf6992" />
