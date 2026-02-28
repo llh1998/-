@@ -71,21 +71,34 @@ def prophet_error(df,day):
     df : 明细数据
     day : 时间，例'2021-02-23'
     '''
-    
     #转换成prophet所需格式
     df = df[['day','ka_rate']]
     df.columns = ['ds','y']
     
-    m_e = Prophet(interval_width = 0.93)
-    m_e.fit(df)
-    future_e = m_e.make_future_dataframe(periods=0)
-    forecast_e = m_e.predict(future_e)
     
-    df['yhat_lower'] = forecast_e['yhat_lower']
-    df['yhat_upper'] = forecast_e['yhat_upper']
-    day_error = list(df[((df['y'] - df['yhat_lower'])<0) | ((df['y'] - df['yhat_upper'])>0)]['ds'])
+    #神经网络prophet修改后
+    m = NeuralProphet(
+    n_forecasts=1,
+    yearly_seasonality=False,
+    weekly_seasonality=False,
+    daily_seasonality=False,
+    epochs=100)
+
+metrics = m.fit(df, freq='D')
+forecast = m.predict(df)
+# --- 3. 异常点检测逻辑 ---
+# 计算残差 (实际值与预测值的绝对差)
+forecast['residual'] = (forecast['y'] - forecast['yhat1']).abs()
+# 设定动态阈值：均值 + 2倍标准差 (Sigma原则)
+threshold = forecast['residual'].mean() + 2 * forecast['residual'].std()
+forecast['is_outlier'] = forecast['residual'] > threshold
+# 筛选异常点明细
+outliers = forecast[forecast['is_outlier']].copy()
+outlier_dates = outliers['ds'].dt.strftime('%Y-%m-%d').tolist()
+
     
-    result = 1 if day in day_error else 0 
+
+    result = 1 if day in outlier_dates else 0 
     return result
 
 # 多维度下钻分析 - 文字
