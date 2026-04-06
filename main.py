@@ -16,7 +16,7 @@ plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 def analyze_specific_day(target_date_str):
     # 1. 核心配置 (以下空白未填处为个人信息)
-    csv_path = r"C:\Users\21185\Desktop\dataanalysis.csv"
+    csv_path = r"C:\Users\21185\Desktop\video_quality_data.csv"
     DB_CONF = {'host': '', 'user': 'root', 'password': '', 'database': '', 'charset': 'utf8mb4'}
     EMAIL_CONF = {
         'smtp_server': 'smtp.qq.com', 
