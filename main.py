@@ -15,13 +15,13 @@ matplotlib.use('Agg')
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 def analyze_specific_day(target_date_str):
-    # 1. 核心配置 
+    # 1. 核心配置 (以下空白未填处为个人信息)
     csv_path = r"C:\Users\21185\Desktop\dataanalysis.csv"
-    DB_CONF = {'host': '127.0.0.1', 'user': 'root', 'password': '123456', 'database': 'report', 'charset': 'utf8mb4'}
+    DB_CONF = {'host': '', 'user': 'root', 'password': '', 'database': '', 'charset': 'utf8mb4'}
     EMAIL_CONF = {
         'smtp_server': 'smtp.qq.com', 
         'sender': '2118504150@qq.com', 
-        'password': 'bfefumqodtawdbjb', 
+        'password': '', 
         'receiver': '2118504150@qq.com'
     }
     conn = pymysql.connect(**DB_CONF)
