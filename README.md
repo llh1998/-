@@ -19,41 +19,44 @@ cdn_name：CDN的全称是Content Delivery Network，即内容分发网络。CDN
 
  
 ##  四、python连接mysql取数
-通过Pymysql连接MYSQL数据库，设置day变量实现动态取数
+通过Pysql连接本地MYSQL数据库，设置target_date变量实现动态取数
 
 ##  五、数据指标体系构建
-1. 业务目标是对于该业务（直播流媒体），核心目标通常是提供流畅的视频观看体验，提升用户留存。具体目标是降低播放卡顿率，优化不同地域/运营商的连接质量。
-2. 业务策略是为了达成上述目标，可以采取以下策略：首先是CDN 调度策略也就是在不同省份和运营商之间，选择质量更优的 CDN 厂商。其次是平台适配策略，针对不同终端进行性能调优。
-最后是高热度监控： 针对高并发房间进行重点带宽保障。
-3. 衡量指标是基于数据集中的字段，我们可以构建三层指标：A. 核心指标。卡顿率是$Stutter Rate = \frac{\sum ka\_people}{\sum all\_people}$
-这是衡量用户体验的最直接指标。活跃用户规模是总观看人数 $all\_people$ 的加总。
-B. 过程指标包括以下几个方面。CDN 质量分布： 不同 cdn_name 下的卡顿率对比。区域质量覆盖： 不同 province 和 isp 的卡顿率排名（找出弱网络区域）。平台兼容性： 不同 user_plat 的表现差异。
-C. 细分维度。通过以下维度对时间和roomid进行切片分析
+通过osm模型来构造我们的数据指标体系：1. 核心目标通常是提供流畅的视频观看体验，提升用户留存。具体目标是降低播放卡顿率，优化不同地域运营商的连接质量。
+2. 业务策略是为了达成上述目标，可以采取以下策略：首先是CDN调度策略，也就是在不同省份和运营商之间，选择质量更优的CDN厂商；其次是平台适配策略，针对不同的用户平台进行性能调优；
+最后是监控人数较多的roomid以及它的卡顿率。
+3. 为了衡量上述业务策略，可以采取以下指标：(1)总体卡顿率 = sum(ka_people)\sum(all_people)和总观看人数all_people
+(2)CDN 质量分布指标是不同cdn_name下的卡顿率对比；区域质量覆盖指标是不同province和isp的卡顿率排名；平台兼容性是不同用户平台的表现差异。
+(3)通过第二层维度对时间和roomid进行切片分析
+综上就构造好了一个数据指标体系
 
 
 ##  六、神经网络Prophet时序异常检测算法
-由于大多类似卡顿率等核心指标均周期性，传统的异常检测算法难以学习周期性，所以我们选择FaceBook开源的时序异常检测算法神经网络Prophet。
+由于大多类似卡顿率等核心指标均周期性，传统的异常检测算法难以学习周期性，所以我们选择FaceBook开源的时序异常检测算法神经网络Prophet算法。
+神经网络prophet算法可以排除掉周期性趋势这两方面的影响，这就是它为什么有效的原因
 
-##  七、基于影响度的根因定位算法
-其核心借鉴随机森林的特征重要性计算思想。
-在随机森林中某个特征X的重要性的计算方法如下：
-1：对于随机森林中的每一颗决策树,使用相应的OOB(袋外数据)数据来计算它的袋外数据误差,记为errOOB1。
-2：随机地对袋外数据OOB所有样本的特征X加入噪声干扰(相当于删除该列。),再次计算它的袋外数据误差,记为errOOB2。
-3：假设随机森林中有Ntree棵树,那么对于特征X的重要性=∑(errOOB2-errOOB1)/Ntree,袋外的准确率大幅度变化,则说明这个特征对于样本的分类结果影响很大,也就是说它的重要程度比较高。
-yxd = 去掉之前的卡顿率 - 去掉某维度的卡顿率，yxd越大说明该维度越容易让指标突增，yxd越小说明该维度越容易让指标突降，yxd接近于0，说明该维度完全不影响指标
-当Prophet时序异常检测算法识别出存在异常时，程序会运行根因定位算法智能分析出可能的TOP3根因，并绘制影响度表格给予各根因对异常的影响度，以及根因验证图表。
+##  七、根因定位
+如果去除某维度某元素的数据时，发现KPI恢复正常，则该维度该元素就是KPI异常的根因。其影响度计算公式为：yxd = value1/cnt1 - ((value1 - value2) / (cnt1 - cnt2))
+value1/cnt1 ：比如是2021-02-23日的卡顿率，((value1 - value2) / (cnt1 - cnt2)) ： 2021-02-23日的去掉七牛云数据的卡顿率，yxd = 去掉之前的卡顿率 - 去掉某维度的卡顿率。
+yxd越大说明该维度越容易让指标突增，yxd越小说明该维度越容易让指标突降，yxd接近于0，说明该维度完全不影响指标。
+同时的话，我们不止考虑某一个特定维度的影响，还会考虑交叉维度是否为异常的根因。
 
 ##  八、使用STMP+EMAIL库实现自动化邮件发送
+通过自动化邮报，可以让管理层只需打开邮报就知道当天的异常情况。这里用到的stmp+email的python相关库
+<img width="1609" height="855" alt="image" src="https://github.com/user-attachments/assets/0873bedc-589b-444f-b4ad-4106eb1f44c8" />
+<img width="1606" height="836" alt="image" src="https://github.com/user-attachments/assets/a7226acc-f84c-49c0-88bf-792ce5a0a410" />
+<img width="1621" height="813" alt="image" src="https://github.com/user-attachments/assets/61cbfddd-ab21-49a4-8d31-0c193df11986" />
+
 
 ##  九、动态仪表盘制作
-光使用python进行管理还是远远不够的，所以通过上文构造的数据指标体系构造动态仪表盘很有必要。效果如下图所示
+通过动态仪表盘能比较形象看到指标的变化
 <img width="1413" height="978" alt="Screenshot 2026-04-05 220619" src="https://github.com/user-attachments/assets/06ba822d-d314-4b8f-9049-39a4a4dc1a63" />
 <img width="1409" height="792" alt="image" src="https://github.com/user-attachments/assets/b0f4c184-a53b-4b8b-8618-186675c2ce23" />
 
-##  十、效果
-通过每日取数判断是否异常，同时分是否异常决定发送异常时的报表和非异常的报表。实现了自动化数据分析
-<img width="1641" height="862" alt="image" src="https://github.com/user-attachments/assets/c1d5f809-497b-4221-ad2a-cd9946598ce6" />
-<img width="1427" height="858" alt="image" src="https://github.com/user-attachments/assets/65f0dc44-4214-45a4-b7b7-4fe329975af7" />
+
+
+
+
 
 
 
